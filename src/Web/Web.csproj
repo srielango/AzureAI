@@ -23,6 +23,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="FluentValidation.AspNetCore" />
+    <PackageReference Include="Refit" />
+    <PackageReference Include="Refit.HttpClientFactory" />
   </ItemGroup>
 
 

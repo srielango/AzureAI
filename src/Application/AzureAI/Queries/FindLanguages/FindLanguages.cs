@@ -1,19 +1,19 @@
-﻿using System.Security.Claims;
+﻿using System.Net.Http.Json;
 using System.Text;
-using System.Text.Json;
 using System.Web;
-using AzureAI.Application.Common.Interfaces;
 using AzureAI.Domain.Configuration;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 
 namespace AzureAI.Application.AzureAI.Queries.FindLanguages;
 
-public record FindLanguagesQuery : IRequest<string>
+public record FindLanguagesQuery : IRequest<FindLanguagesResponse>
 {
     public required string InputText { get; set; }
 }
+
+public record DocumentList (List<Document> Documents);
+public record Document(int Id, string Text);
 
 public class FindLanguagesQueryValidator : AbstractValidator<FindLanguagesQuery>
 {
@@ -22,7 +22,7 @@ public class FindLanguagesQueryValidator : AbstractValidator<FindLanguagesQuery>
     }
 }
 
-public class FindLanguagesQueryHandler : IRequestHandler<FindLanguagesQuery, string>
+public class FindLanguagesQueryHandler : IRequestHandler<FindLanguagesQuery, FindLanguagesResponse>
 {
     private readonly AISettingsOption _aISettingsOption;
 
@@ -31,36 +31,25 @@ public class FindLanguagesQueryHandler : IRequestHandler<FindLanguagesQuery, str
         _aISettingsOption = options.Value;
     }
 
-    public async Task<string> Handle(FindLanguagesQuery request, CancellationToken cancellationToken)
+    public async Task<FindLanguagesResponse> Handle(FindLanguagesQuery request, CancellationToken cancellationToken)
     {
         StringBuilder result = new StringBuilder();
 
         try
         {
-            var jsonBody = new JObject(
-                new JProperty("documents",
-                new JArray(
-                    new JObject(
-                        new JProperty("id", 1),
-                        new JProperty("text", request.InputText)
-                        ))));
-
-            var utf8 = new UTF8Encoding(true, true);
-            var encodedBytes = utf8.GetBytes(jsonBody.ToString());
+            var documents = new DocumentList(new List<Document>()
+            {
+                new Document(1, request.InputText)
+            });
 
             var client = new HttpClient();
             var queryString = HttpUtility.ParseQueryString(string.Empty);
 
             client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", _aISettingsOption.ServiceKey);
 
-            var uri = _aISettingsOption.ServiceEndPoint + "text/analytics/v3.1/languages?" + queryString;
+            var uri = _aISettingsOption.ServiceEndPoint + "/text/analytics/v3.1/languages?" + queryString;
 
-            HttpResponseMessage response;
-            using (var content = new ByteArrayContent(encodedBytes))
-            {
-                content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
-                response = await client.PostAsync(uri, content);
-            }
+            using var response = await client.PostAsJsonAsync(uri, documents);
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
@@ -77,7 +66,10 @@ public class FindLanguagesQueryHandler : IRequestHandler<FindLanguagesQuery, str
             {
                 result.AppendLine(response.ToString());
             }
-            return result.ToString();
+
+            var responseDocument = await response.Content.ReadFromJsonAsync<FindLanguagesResponse>();
+
+            return responseDocument ?? new FindLanguagesResponse();
 
         }
         catch (Exception ex)

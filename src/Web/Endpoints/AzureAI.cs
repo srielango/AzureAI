@@ -11,7 +11,7 @@ public class AzureAI : EndpointGroupBase
             .MapGet(FindLanguage);
     }
 
-    public Task<string> FindLanguage(ISender sender, [AsParameters] FindLanguagesQuery query)
+    public Task<FindLanguagesResponse> FindLanguage(ISender sender, [AsParameters] FindLanguagesQuery query)
     {
         return sender.Send(query);
     }
