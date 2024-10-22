@@ -13,13 +13,7 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddWebServices();
 
 builder.Services.Configure<AISettingsOption>(builder.Configuration.GetSection(AISettingsOption.Name));
-var serviceEndPoint = builder.Configuration.GetValue<string>("AISettings.ServiceEndPoint") ?? string.Empty;
-
-//var authToken = "***WRITE YOUR API READ ACCESS TOKEN HERE***";
-//var refitSettings = new RefitSettings()
-//{
-//    AuthorizationHeaderValueGetter = (rq, ct) => Task.FromResult(authToken),
-//};
+var serviceEndPoint = builder.Configuration.GetValue<string>("AISettings:ServiceEndPoint") ?? string.Empty;
 
 builder.Services
     .AddRefitClient<IAzureAIClient>()

@@ -1,9 +1,10 @@
 ﻿using System.Net.Http.Json;
 using System.Text;
-using System.Web;
+using System.Text.Json;
+using AzureAI.Application.Common.Interfaces;
 using AzureAI.Domain.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
 
 namespace AzureAI.Application.AzureAI.Queries.FindLanguages;
 
@@ -25,57 +26,42 @@ public class FindLanguagesQueryValidator : AbstractValidator<FindLanguagesQuery>
 public class FindLanguagesQueryHandler : IRequestHandler<FindLanguagesQuery, FindLanguagesResponse>
 {
     private readonly AISettingsOption _aISettingsOption;
+    private readonly IAzureAIClient _azureAIClient;
+    private readonly ILogger<FindLanguagesQueryHandler> _logger;
 
-    public FindLanguagesQueryHandler(IOptions<AISettingsOption> options)
+    public FindLanguagesQueryHandler(IOptions<AISettingsOption> options, IAzureAIClient azureAIClient, ILogger<FindLanguagesQueryHandler> logger)
     {
         _aISettingsOption = options.Value;
+        _azureAIClient = azureAIClient;
+        _logger = logger;
     }
 
     public async Task<FindLanguagesResponse> Handle(FindLanguagesQuery request, CancellationToken cancellationToken)
     {
-        StringBuilder result = new StringBuilder();
-
         try
         {
-            var documents = new DocumentList(new List<Document>()
+            var documents = new DocumentList(new List<Document>
             {
                 new Document(1, request.InputText)
             });
 
-            var client = new HttpClient();
-            var queryString = HttpUtility.ParseQueryString(string.Empty);
+            var json = JsonSerializer.Serialize(documents);
 
-            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", _aISettingsOption.ServiceKey);
-
-            var uri = _aISettingsOption.ServiceEndPoint + "/text/analytics/v3.1/languages?" + queryString;
-
-            using var response = await client.PostAsJsonAsync(uri, documents);
-
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            var headers = new Dictionary<string, string>
             {
-                var responseContent = await response.Content.ReadAsStringAsync();
-                var results = JObject.Parse(responseContent);
-                result.AppendLine(results.ToString());
+                { "Content-Type", "application/json" },
+                { "Ocp-Apim-Subscription-Key", _aISettingsOption.ServiceKey }
+            };
 
-                foreach(JObject document in results["documents"]!)
-                {
-                    result.AppendLine("\nLanguage: " + (string)document["detectedLanguage"]!["name"]!);
-                }
-            }
-            else
-            {
-                result.AppendLine(response.ToString());
-            }
-
+            using var response = await _azureAIClient.FindLanguage(json, headers);
             var responseDocument = await response.Content.ReadFromJsonAsync<FindLanguagesResponse>();
 
             return responseDocument ?? new FindLanguagesResponse();
-
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex);
-            throw;
+            _logger.LogError($"Error occurred in FindLanguagesQueryHandler. {ex}");
+            throw new Exception("Error occurred in FindLanguagesQueryHandler", ex);
         }
     }
 }
