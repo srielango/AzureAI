@@ -16,6 +16,8 @@ public static class DependencyInjection
 
         services.AddScoped<IUser, CurrentUser>();
 
+        services.AddScoped<IFileHandler, FileHandler>();
+
         services.AddHttpContextAccessor();
 
         services.AddHealthChecks()

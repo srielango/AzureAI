@@ -8,6 +8,7 @@
   <ItemGroup>
     <PackageReference Include="Ardalis.GuardClauses" />
     <PackageReference Include="AutoMapper" />
+    <PackageReference Include="Azure.AI.TextAnalytics" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
@@ -23,7 +24,6 @@
     <Folder Include="AzureAIDocumentIntelligence\Queries\ExtractDataFromForms\" />
     <Folder Include="AzureAIDocumentIntelligence\Queries\CreateComposedModel\" />
     <Folder Include="AzureAIDocumentIntelligence\Queries\UsePrebuiltModel\" />
-    <Folder Include="AzureAILanguage\Queries\AnalyzeText\" />
     <Folder Include="AzureAILanguage\Queries\CreateQnA\" />
     <Folder Include="AzureAILanguage\Queries\CreateLanguageUnderstandingModel\" />
     <Folder Include="AzureAILanguage\Queries\CreateCustomTextClassification\" />

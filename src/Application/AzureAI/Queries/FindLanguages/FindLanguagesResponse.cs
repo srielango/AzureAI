@@ -5,6 +5,6 @@ public record FindLanguagesResponse
     public string ModelVersion { get; set; } = string.Empty;
 }
 
-public record ResponseDocument(int Id, DetectedLanguage DetectedLanguage);
+public record ResponseDocument(int Id, Language DetectedLanguage);
 
-public record DetectedLanguage (string Name, string Iso6391Name, decimal confidenceScore);
+public record Language (string Name, string Iso6391Name, decimal confidenceScore);

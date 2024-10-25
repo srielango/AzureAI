@@ -38,6 +38,37 @@
         }
       }
     },
+    "/api/AzureAILanguage/TextAnalyzer": {
+      "get": {
+        "tags": [
+          "AzureAILanguage"
+        ],
+        "operationId": "AnalyzeText",
+        "parameters": [
+          {
+            "name": "InputText",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalyzeTextResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/TodoItems": {
       "get": {
         "tags": [
@@ -813,11 +844,11 @@
             "format": "int32"
           },
           "detectedLanguage": {
-            "$ref": "#/components/schemas/DetectedLanguage"
+            "$ref": "#/components/schemas/Language"
           }
         }
       },
-      "DetectedLanguage": {
+      "Language": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -830,6 +861,169 @@
           "confidenceScore": {
             "type": "number",
             "format": "decimal"
+          }
+        }
+      },
+      "AnalyzeTextResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "documentDetails": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DocumentDetails"
+            }
+          }
+        }
+      },
+      "DocumentDetails": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "originalText": {
+            "type": "string"
+          },
+          "detectedLanguage": {
+            "type": "string"
+          },
+          "sentiment": {
+            "type": "string"
+          },
+          "keyPhrases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "entities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategorizedEntity"
+            }
+          },
+          "linkedEntities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LinkedEntity"
+            }
+          }
+        }
+      },
+      "CategorizedEntity": {
+        "type": "object",
+        "description": "A word or phrase that was recognized as an entity and categorized accordingly by the service's named entity\nrecognition model and taxonomy. For the list of supported categories and subcategories, see\nhttps://learn.microsoft.com/azure/cognitive-services/language-service/named-entity-recognition/concepts/named-entity-categories.",
+        "additionalProperties": false,
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "The text corresponding to the recognized entity, as it appears in the input document.",
+            "nullable": true
+          },
+          "category": {
+            "description": "The category of the entity as recognized by the service's named entity recognition model. For the list of\nsupported categories, see\nhttps://learn.microsoft.com/azure/cognitive-services/language-service/named-entity-recognition/concepts/named-entity-categories.",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EntityCategory"
+              }
+            ]
+          },
+          "subCategory": {
+            "type": "string",
+            "description": "The subcategory of the entity (if applicable) as recognized by the service's named entity recognition\nmodel. For the list of supported categories and subcategories, see\nhttps://learn.microsoft.com/azure/cognitive-services/language-service/named-entity-recognition/concepts/named-entity-categories.",
+            "nullable": true
+          },
+          "confidenceScore": {
+            "type": "number",
+            "description": "The score between 0.0 and 1.0 indicating the confidence that the recognized entity accurately corresponds\nto the text substring.",
+            "format": "double"
+          },
+          "offset": {
+            "type": "integer",
+            "description": "The starting position of the matching text in the input document.",
+            "format": "int32"
+          },
+          "length": {
+            "type": "integer",
+            "description": "The length of the matching text in the input document.",
+            "format": "int32"
+          }
+        }
+      },
+      "EntityCategory": {
+        "type": "object",
+        "description": "Gets the entity category inferred by the Language service's named entity recognition model.\nThe list of available categories is described at \nSupported entity categories in Named Entity Recognition.",
+        "additionalProperties": false
+      },
+      "LinkedEntity": {
+        "type": "object",
+        "description": "The LinkedEntity. ",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Gets the formal name of the entity.",
+            "nullable": true
+          },
+          "dataSourceEntityId": {
+            "type": "string",
+            "description": "Gets the unique identifier of the entity in the data source.",
+            "nullable": true
+          },
+          "language": {
+            "type": "string",
+            "description": "Gets the language used in the data source.",
+            "nullable": true
+          },
+          "dataSource": {
+            "type": "string",
+            "description": "Gets the name of the data source used to extract the entity linking.",
+            "nullable": true
+          },
+          "url": {
+            "type": "string",
+            "description": "Gets the URL that identifies the linked entity's entry in the data source.",
+            "format": "uri",
+            "nullable": true
+          },
+          "matches": {
+            "type": "array",
+            "description": "Collection identifying the substrings of the document that correspond\nto this linked entity.",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/LinkedEntityMatch"
+            }
+          },
+          "bingEntitySearchApiId": {
+            "type": "string",
+            "description": "Bing Entity Search API unique identifier of the recognized entity.\n           Use in conjunction with the Bing Entity Search API to fetch additional relevant information.\n           ",
+            "nullable": true
+          }
+        }
+      },
+      "LinkedEntityMatch": {
+        "type": "object",
+        "description": "The Match. ",
+        "additionalProperties": false,
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Gets the entity text as it appears in the document.",
+            "nullable": true
+          },
+          "confidenceScore": {
+            "type": "number",
+            "description": "Gets a score between 0 and 1, indicating the confidence that this\nsubstring matches the corresponding linked entity.",
+            "format": "double"
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Gets the starting position for the matching text in the document.",
+            "format": "int32"
+          },
+          "length": {
+            "type": "integer",
+            "description": "Gets the length of the matching text in the sentence.",
+            "format": "int32"
           }
         }
       },
