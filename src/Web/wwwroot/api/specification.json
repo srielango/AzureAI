@@ -69,6 +69,38 @@
         }
       }
     },
+    "/api/AzureAILanguage/QnA": {
+      "get": {
+        "tags": [
+          "AzureAILanguage"
+        ],
+        "operationId": "QnA",
+        "parameters": [
+          {
+            "name": "Question",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QnAResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/TodoItems": {
       "get": {
         "tags": [
@@ -1024,6 +1056,155 @@
             "type": "integer",
             "description": "Gets the length of the matching text in the sentence.",
             "format": "int32"
+          }
+        }
+      },
+      "QnAResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "answers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KnowledgeBaseAnswer"
+            }
+          }
+        }
+      },
+      "KnowledgeBaseAnswer": {
+        "type": "object",
+        "description": "Represents knowledge base answer. ",
+        "additionalProperties": false,
+        "properties": {
+          "questions": {
+            "type": "array",
+            "description": "List of questions associated with the answer. ",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "answer": {
+            "type": "string",
+            "description": "Answer text. ",
+            "nullable": true
+          },
+          "confidence": {
+            "type": "number",
+            "description": "Answer confidence score, value ranges from 0 to 1. ",
+            "format": "double",
+            "nullable": true
+          },
+          "qnaId": {
+            "type": "integer",
+            "description": "ID of the QnA result. ",
+            "format": "int32",
+            "nullable": true
+          },
+          "source": {
+            "type": "string",
+            "description": "Source of QnA result. ",
+            "nullable": true
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Metadata associated with the answer, useful to categorize or filter question answers. ",
+            "nullable": true,
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "dialog": {
+            "description": "Dialog associated with Answer. ",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/KnowledgeBaseAnswerDialog"
+              }
+            ]
+          },
+          "shortAnswer": {
+            "description": "Answer span object of QnA with respect to user's question. ",
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/AnswerSpan"
+              }
+            ]
+          }
+        }
+      },
+      "KnowledgeBaseAnswerDialog": {
+        "type": "object",
+        "description": "Dialog associated with Answer. ",
+        "additionalProperties": false,
+        "properties": {
+          "isContextOnly": {
+            "type": "boolean",
+            "description": "To mark if a prompt is relevant only with a previous question or not. If true, do not include this QnA as search result for queries without context; otherwise, if false, ignores context and includes this QnA in search result. ",
+            "nullable": true
+          },
+          "prompts": {
+            "type": "array",
+            "description": "List of prompts associated with the answer. ",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/KnowledgeBaseAnswerPrompt"
+            }
+          }
+        }
+      },
+      "KnowledgeBaseAnswerPrompt": {
+        "type": "object",
+        "description": "Prompt for an answer. ",
+        "additionalProperties": false,
+        "properties": {
+          "displayOrder": {
+            "type": "integer",
+            "description": "Index of the prompt - used in ordering of the prompts. ",
+            "format": "int32",
+            "nullable": true
+          },
+          "qnaId": {
+            "type": "integer",
+            "description": "QnA ID corresponding to the prompt. ",
+            "format": "int32",
+            "nullable": true
+          },
+          "displayText": {
+            "type": "string",
+            "description": "Text displayed to represent a follow up question prompt. ",
+            "nullable": true
+          }
+        }
+      },
+      "AnswerSpan": {
+        "type": "object",
+        "description": "Answer span object of QnA. ",
+        "additionalProperties": false,
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Predicted text of answer span. ",
+            "nullable": true
+          },
+          "confidence": {
+            "type": "number",
+            "description": "Predicted score of answer span, value ranges from 0 to 1. ",
+            "format": "double",
+            "nullable": true
+          },
+          "offset": {
+            "type": "integer",
+            "description": "The answer span offset from the start of answer. ",
+            "format": "int32",
+            "nullable": true
+          },
+          "length": {
+            "type": "integer",
+            "description": "The length of the answer span. ",
+            "format": "int32",
+            "nullable": true
           }
         }
       },
