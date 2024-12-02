@@ -1,5 +1,6 @@
 ﻿
 using AzureAI.Application.AzureAILanguage.Queries.AnalyzeText;
+using AzureAI.Application.AzureAILanguage.Queries.CreateLanguageUnderstandingModel;
 using AzureAI.Application.AzureAILanguage.Queries.CreateQnA;
 using AzureAI.Application.AzureAILanguage.Queries.QnA;
 
@@ -11,7 +12,9 @@ public class AzureAILanguage : EndpointGroupBase
     {
         app.MapGroup(this)
             .MapGet(AnalyzeText, "TextAnalyzer")
-            .MapGet(QnA, "QnA");
+            .MapGet(QnA, "QnA")
+            .MapGet(LanguageUnderstanding, "LanguageUnderstanding")
+            ;
     }
 
     public Task<AnalyzeTextResponse> AnalyzeText(ISender sender, [AsParameters] AnalyzeTextQuery query)
@@ -20,6 +23,11 @@ public class AzureAILanguage : EndpointGroupBase
     }
 
     public Task<QnAResponse> QnA(ISender sender, [AsParameters] QnAQuery query)
+    {
+        return sender.Send(query);
+    }
+
+    public Task<CreateLanguageUnderstandingResponse> LanguageUnderstanding(ISender sender, [AsParameters] CreateLanguageUnderstandingModelQuery query)
     {
         return sender.Send(query);
     }

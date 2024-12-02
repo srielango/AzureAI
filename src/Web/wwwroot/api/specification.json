@@ -101,6 +101,38 @@
         }
       }
     },
+    "/api/AzureAILanguage/LanguageUnderstanding": {
+      "get": {
+        "tags": [
+          "AzureAILanguage"
+        ],
+        "operationId": "LanguageUnderstanding",
+        "parameters": [
+          {
+            "name": "UserInput",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateLanguageUnderstandingResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/TodoItems": {
       "get": {
         "tags": [
@@ -1205,6 +1237,24 @@
             "description": "The length of the answer span. ",
             "format": "int32",
             "nullable": true
+          }
+        }
+      },
+      "CreateLanguageUnderstandingResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "userInput": {
+            "type": "string"
+          },
+          "conversationalTaskResult": {
+            "type": "string"
+          },
+          "topIntent": {
+            "type": "string"
+          },
+          "response": {
+            "type": "string"
           }
         }
       },
