@@ -3,6 +3,7 @@ using AzureAI.Application.AzureAILanguage.Queries.AnalyzeText;
 using AzureAI.Application.AzureAILanguage.Queries.CreateLanguageUnderstandingModel;
 using AzureAI.Application.AzureAILanguage.Queries.CreateQnA;
 using AzureAI.Application.AzureAILanguage.Queries.QnA;
+using AzureAI.Application.AzureAILanguage.Queries.RecognizeSpeech;
 
 namespace AzureAI.Web.Endpoints;
 
@@ -14,6 +15,7 @@ public class AzureAILanguage : EndpointGroupBase
             .MapGet(AnalyzeText, "TextAnalyzer")
             .MapGet(QnA, "QnA")
             .MapGet(LanguageUnderstanding, "LanguageUnderstanding")
+            .MapGet(RecognizeSpeech, "RecognizeSpeech")
             ;
     }
 
@@ -28,6 +30,10 @@ public class AzureAILanguage : EndpointGroupBase
     }
 
     public Task<CreateLanguageUnderstandingResponse> LanguageUnderstanding(ISender sender, [AsParameters] CreateLanguageUnderstandingModelQuery query)
+    {
+        return sender.Send(query);
+    }
+    public Task<string> RecognizeSpeech(ISender sender, [AsParameters] RecognizeSpeechQuery query)
     {
         return sender.Send(query);
     }
