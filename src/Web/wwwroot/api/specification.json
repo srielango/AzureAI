@@ -153,6 +153,48 @@
         }
       }
     },
+    "/api/AzureOpenAI": {
+      "get": {
+        "tags": [
+          "AzureOpenAI"
+        ],
+        "operationId": "OpenAIChat",
+        "parameters": [
+          {
+            "name": "SystemMessage",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          },
+          {
+            "name": "UserMessage",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpenAIChatResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Users/register": {
       "post": {
         "tags": [
@@ -910,6 +952,15 @@
             "type": "string"
           },
           "response": {
+            "type": "string"
+          }
+        }
+      },
+      "OpenAIChatResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "chatResponse": {
             "type": "string"
           }
         }

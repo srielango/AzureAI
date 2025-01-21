@@ -10,6 +10,7 @@
     <PackageReference Include="AutoMapper" />
     <PackageReference Include="Azure.AI.Language.Conversations" />
     <PackageReference Include="Azure.AI.Language.QuestionAnswering" />
+    <PackageReference Include="Azure.AI.OpenAI" />
     <PackageReference Include="Azure.AI.TextAnalytics" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
     <PackageReference Include="Microsoft.CognitiveServices.Speech" />
@@ -53,7 +54,6 @@
     <Folder Include="AzureOpenAI\Queries\GenerateImages\" />
     <Folder Include="AzureOpenAI\Queries\ImplementRAG\" />
     <Folder Include="AzureOpenAI\Queries\UsePromptEngineering\" />
-    <Folder Include="AzureOpenAI\Queries\UseOpenAI\" />
   </ItemGroup>
 
 </Project>
